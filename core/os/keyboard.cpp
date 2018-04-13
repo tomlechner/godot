@@ -435,15 +435,32 @@ int find_keycode(const String &p_code) {
 
 	const _KeyCodeText *kct = &_keycodes[0];
 
-	while (kct->text) {
+	int keycode = 0;
 
-		if (p_code.nocasecmp_to(kct->text) == 0) {
-			return kct->code;
+	Vector<String> codes = p_code.split("+");
+
+	for (int i = 0; i < codes.size(); i++) {
+		if (codes[i] == find_keycode_name(KEY_SHIFT))
+			keycode |= KEY_MASK_SHIFT;
+		else if (codes[i] == find_keycode_name(KEY_CONTROL))
+			keycode |= KEY_MASK_CTRL;
+		else if (codes[i] == find_keycode_name(KEY_ALT))
+			keycode |= KEY_MASK_ALT;
+		else if (codes[i] == find_keycode_name(KEY_META))
+			keycode |= KEY_MASK_META;
+		else {
+
+			while (kct->text) {
+
+				if (codes[i].nocasecmp_to(kct->text) == 0) {
+					keycode |= kct->code;
+				}
+				kct++;
+			}
 		}
-		kct++;
 	}
 
-	return 0;
+	return keycode;
 }
 
 const char *find_keycode_name(int p_keycode) {
